@@ -21,63 +21,111 @@ import {
 
 const input = readPuzzleInput({ day: 14, seperator: "\n" }) as string[];
 
-type Bus = [number, number];
+type Command = "mask" | "mem";
 
-const closest = (time: number) => (bus: Bus) => {
-  let t = 0;
-  while (!isInteger((time + t) / bus[1])) t++;
-  return [t, bus];
-};
-
-const getBusses = (input: string[]) => {
-  return input[1] //?
-    .split(comma)
-    .map(toIndexed)
-    .filter(applyAt(1)(match(digits)))
-    .map(toNumbers) as Bus[];
-};
-
-function modInverse(a: number, m: number) {
-  let [m0, x, y, quotient, temp] = [m, 1, 0, 0, 0];
-  if (m == 1) return 0;
-  while (a > 1) {
-    quotient = int(a / m);
-    temp = m;
-    m = a % m;
-    a = temp;
-    temp = y;
-    y = x - quotient * y;
-    x = temp;
+const parseCommand = (str: string): ["mask", string[]] | ["mem", [number, number]] => {
+  const [lhs, rhs] = str.split(" = ");
+  if (lhs.startsWith("mask")) {
+    return ["mask", rhs.split("")];
+  } else {
+    return ["mem", [Number(lhs.replace(/(mem\[)|(\])/gim, "")), Number(rhs)]];
   }
-  if (x < 0) x = x + m0;
-  return x;
-}
-
-function chineseRemainderTheorem(numbers: number[], remainders: number[]) {
-  assert(numbers.length == remainders.length, "input arrays should be same length");
-  const prod = numbers.reduce(multiply); //?
-  return (
-    numbers
-      .map((num, index) => {
-        const frac = int(prod / num);
-        return remainders[index] * modInverse(frac, num) * frac;
-      })
-      .reduce(add) % prod
-  );
-}
+};
 
 function part1(input: string[]) {
-  const time = Number(input[0]);
-  const busses = getBusses(input);
-  const [waitTime, bus] = busses.map(closest(time)).sort(via(0)(ascending))[0] as [number, Bus];
-  return waitTime * bus[1];
+  const memory = new Map<number, number[]>();
+  const commandStream = input.map(parseCommand);
+
+  let currentMask = commandStream[0][1] as string[];
+  commandStream.forEach((command) => {
+    switch (command[0]) {
+      case "mask":
+        {
+          currentMask = command[1];
+        }
+        break;
+      case "mem":
+        {
+          const bin = command[1][1].toString(2).padStart(36, "0").split("").map(Number); //?
+          const masked = currentMask.map((x, i) => {
+            if (x === "X") {
+              return bin[i];
+            } else {
+              return Number(x);
+            }
+          });
+          memory.set(command[1][0], masked);
+        }
+        break;
+      default:
+        break;
+    }
+  });
+  let sum = 0;
+  memory.forEach((val, addr) => {
+    sum += parseInt(val.map(String).join(""), 2);
+  });
+
+  return sum;
 }
+
+const dec2binArray = (n: number) => (v: number): number[] => v.toString(2).padStart(n, "0").split("").map(Number);
 
 function part2(input: string[]) {
-  const busses = getBusses(input); //?
-  const rem = [0, ...busses.map((x) => -x.reduce(subtract)).slice(1)];
-  const num = busses.map(getIndex(1));
-  chineseRemainderTheorem(num, rem); //?
+  const memory = new Map<string, number>();
+  const commandStream = input.map(parseCommand);
+
+  let currentMask = commandStream[0][1] as string[];
+  commandStream.forEach((command) => {
+    switch (command[0]) {
+      case "mask":
+        {
+          currentMask = command[1];
+        }
+        break;
+      case "mem":
+        {
+          const binaddr = dec2binArray(36)(command[1][0]);
+          const floating = currentMask.map((x, i) => {
+            if (x === "0") {
+              return String(binaddr[i]);
+            } else {
+              return x;
+            }
+          });
+
+          const indices = floating.map((x, i) => (x === "X" ? i : false)).filter((x) => x) as number[];
+          const count = indices.length;
+          // for each combination
+          for (let i = 0; i < 2 ** count; i++) {
+            // get binary rep
+            let comb = i.toString(2).padStart(count, "0");
+            let a = [...floating];
+            for (let j = 0; j < indices.length; j++) {
+              a[indices[j]] = comb[j];
+            }
+            memory.set(a.join(""), command[1][1]); //?
+          }
+        }
+        break;
+      default:
+        break;
+    }
+  });
+  let sum = 0;
+  memory.forEach((val, addr) => {
+    sum += val;
+  });
+
+  return sum;
 }
 
-// part2(input);
+// part1(input); //?
+
+const part2ex = `mask = 000000000000000000000000000000X1001X
+mem[42] = 100
+mask = 00000000000000000000000000000000X0XX
+mem[26] = 1`;
+
+// part2(input); //?
+part2(part2ex.split("\n")); //?
