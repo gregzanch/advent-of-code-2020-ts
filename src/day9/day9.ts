@@ -1,4 +1,4 @@
-//@ts-ignore
+//@ts-nocheck
 import { readPuzzleInput, reducers } from "../helpers";
 
 const input = readPuzzleInput({
@@ -65,11 +65,7 @@ function sumUsingIndices(array, startIndex, stopIndex) {
   return sum;
 }
 
-function sliceUsingIndices<T = any>(
-  array: T[],
-  startIndex: number,
-  endIndex: number
-) {
+function sliceUsingIndices<T = any>(array: T[], startIndex: number, endIndex: number) {
   let arr = [] as T[];
   for (let i = startIndex; i <= endIndex; i++) {
     arr.push(array[i]);

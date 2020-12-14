@@ -25,15 +25,9 @@ const rotate = ([x, y]: Coord, times: number): Coord => {
   return [x, y];
 };
 
-const move = ([x, y]: Coord, amt: number, [dx, dy]: Coord): Coord => [
-  x + dx * amt,
-  y + dy * amt,
-];
+const move = ([x, y]: Coord, amt: number, [dx, dy]: Coord): Coord => [x + dx * amt, y + dy * amt];
 
-const step = (mover: keyof State) => (
-  state: State,
-  [op, amt]: Action
-): State => {
+const step = (mover: keyof State) => (state: State, [op, amt]: Action): State => {
   switch (op) {
     case "L":
       return { ...state, waypoint: rotate(state.waypoint, mod(amt / 90, 4)) };
@@ -49,9 +43,7 @@ const step = (mover: keyof State) => (
   }
 };
 
-const solve = (waypoint: Coord, fn: Parameters<typeof step>[0]) => (
-  actions: Action[]
-): number => {
+const solve = (waypoint: Coord, fn: Parameters<typeof step>[0]) => (actions: Action[]): number => {
   const {
     pos: [x, y],
   } = actions.reduce(step(fn), { pos: [0, 0], waypoint });

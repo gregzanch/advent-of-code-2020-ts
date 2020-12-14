@@ -1,5 +1,6 @@
 {
   "compilerOptions": {
+
     "target": "ESNEXT",
     "module": "commonjs",
     "lib": ["ESNext", "ES2020", "DOM"],
@@ -20,7 +21,7 @@
     // "downlevelIteration": true,
     "isolatedModules": true,
 
-    "strict": true,
+    // "strict": true,
     // "noImplicitAny": true,
     // "strictNullChecks": true,
     // "strictFunctionTypes": true,
@@ -79,7 +80,7 @@
       // "downlevelIteration": true,
       // "isolatedModules": true,
 
-      "strict": true,
+      // "strict": true,
       // "noImplicitAny": true,
       // "strictNullChecks": true,
       // "strictFunctionTypes": true,

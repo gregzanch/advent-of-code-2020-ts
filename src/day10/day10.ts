@@ -1,4 +1,4 @@
-//@ts-ignore
+//@ts-nocheck
 import { readPuzzleInput, derivative } from "../helpers";
 
 const input = readPuzzleInput({
@@ -12,9 +12,7 @@ const numbers = joltages.sort((a, b) => a - b);
 
 const differenceArray = [numbers[0], ...derivative(numbers), 3];
 
-const part1 =
-  differenceArray.filter((x) => x == 1).length *
-  differenceArray.filter((x) => x == 3).length; //?
+const part1 = differenceArray.filter((x) => x == 1).length * differenceArray.filter((x) => x == 3).length; //?
 
 function solve(arr: number[], n = 3) {
   // const temp = new Map<number, number[]>();
