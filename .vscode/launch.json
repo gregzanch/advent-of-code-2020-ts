@@ -11,7 +11,7 @@
             "/Users/greg/.config/yarn/global/node_modules/ts-node/register"
         ],
         "args": [
-            "${workspaceFolder}/src/day14/day14.ts"
+            "${workspaceFolder}/src/day18/day18.ts"
         ]
 }
   ]
