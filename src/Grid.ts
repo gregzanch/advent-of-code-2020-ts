@@ -1,6 +1,9 @@
 import { assert } from "console";
 import { clamp, mod, rmod } from "./helpers";
-import { test } from "./test";
+
+const test = (fn, ...args) => {
+  console.log(fn(...args), fn.toString());
+};
 
 export class Grid<T extends string | number> {
   data: T[][];
