@@ -39,6 +39,21 @@ export function readExampleInput({ day, seperator }: ReadInputProps) {
   }
 }
 
+export function intersection<T>(set1: Set<T>, set2: Set<T>): Set<T> {
+  // intersect can be simulated via
+  return new Set([...set1].filter((x) => set2.has(x)));
+}
+
+export function difference<T>(set1: Set<T>, set2: Set<T>): Set<T> {
+  // difference can be simulated via
+  return new Set([...set1].filter((x) => !set2.has(x)));
+}
+
+export function union<T>(set1: Set<T>, set2: Set<T>): Set<T> {
+  // union can be simulated via
+  return new Set([...set1, ...set2]);
+}
+
 export const getIndex = (i: string | number) => (x: any) => x[i];
 export const ascending = <T extends number | string>(a: T, b: T) => (a < b ? -1 : +1);
 export const descending = <T extends number | string>(a: T, b: T) => (a < b ? +1 : -1);
