@@ -299,15 +299,19 @@ function* fibonacci() {
   }
 }
 
-const sequence = fibonacci();
-sequence.next().value;
-sequence.next().value;
-sequence.next().value;
-sequence.next().value;
-sequence.next().value;
-sequence.next().value;
-sequence.next().value;
-sequence.next(true).value;
-sequence.next().value;
-sequence.next().value;
-sequence.next().value;
+const isObject = (x) => typeof x === "object";
+const nonNull = (x) => x != null;
+const isNonNullObject = (x) => isObject(x) && nonNull(x);
+export function deepEqual(x: any, y: any) {
+  if (Object.is(x, y) || x === y) return true;
+  else if (isNonNullObject(x) && isNonNullObject(y)) {
+    if (Object.keys(x).length != Object.keys(y).length) return false;
+    for (var prop in x) {
+      if (y.hasOwnProperty(prop)) {
+        if (!deepEqual(x[prop], y[prop])) return false;
+      } else return false;
+    }
+
+    return true;
+  } else return false;
+}

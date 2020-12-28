@@ -1,5 +1,4 @@
-import { rawListeners } from "process";
-import { test, type } from "ramda";
+import { Grid } from "../Grid";
 import * as helpers from "../helpers";
 
 type TBLR = {
@@ -397,98 +396,47 @@ function part1(input: string) {
     completeMap = transpose(completeMap);
     completeMaps.push(completeMap.map((x) => x.join("")));
   }
+  completeMaps.map(findSeaMonsters).filter((x) => x)[0]; //?
+}
 
-  const seamonster = [`..................#.`, `#....##....##....###`, `.#..#..#..#..#..#...`];
-  const seamonsterLength = `..................#.`.length;
-  const seamonsterregex = seamonster.map((x) => new RegExp(x, "g"));
-  const len = completeMaps[0][0].length;
-  const theregex = new RegExp(
-    `(?:..................#.).{${len - seamonsterLength}}(?:#....##....##....###).{${
-      len - seamonsterLength
-    }}(.)#(..)#(..)#(..)#(..)#(..)#(...)`,
-    "gm"
+function findSeaMonsters(map: string[]) {
+  const monster = ["..................#.", "#....##....##....###", ".#..#..#..#..#..#..."];
+  // const offsets =
+  const offsets = monster
+    .map((x, i) => {
+      return x
+        .split("")
+        .map((y, j) => (y === "#" ? j : false))
+        .filter((y) => y)
+        .map((y) => [i, y] as [number, number]);
+    })
+    .flat(); //?
+  // const monsterr = ["....................#...", "..#....##....##....###..", "...#..#..#..#..#..#....."];
+
+  const grid = new Grid(
+    map.map((x) => x.split("")),
+    Grid.BoundaryConditions.none
   );
 
-  const matches = completeMaps
-    .map((x) => x.join(""))
-    .filter((x) => {
-      if (x.match(theregex)) {
-        return true;
-      }
-    }); //?
-
-  const match = helpers.splitEvery(matches[0].split(""), 96).map((x) => x.join("")) as string[];
-
-  function getOffsets(str: string, regex: RegExp) {
-    let m1 = str.match(regex);
-    if (!m1) return;
-    let offsets = [];
-    let lastOffset = 0;
-    m1.forEach((mm1) => {
-      const subi = str.indexOf(mm1, lastOffset);
-      offsets.push(subi);
-      lastOffset = subi;
-    });
-    return offsets;
-  }
-
-  for (let i = 0; i < match.length - 2; i++) {
-    if (match[i].match(seamonsterregex[0])) {
-      const offsets = [
-        getOffsets(match[i], seamonsterregex[0]),
-        getOffsets(match[i + 1], seamonsterregex[1]),
-        getOffsets(match[i + 2], seamonsterregex[2]),
-      ];
-      if (offsets.filter((x) => x).length == 3) {
-        const setoffsets = offsets.map((x) => new Set(x));
-        const allsets = new Set([...setoffsets[0], ...setoffsets[1], ...setoffsets[2]]);
-        const sharedOffsets = [];
-        allsets.forEach((v) => {
-          if (setoffsets[0].has(v) && setoffsets[1].has(v) && setoffsets[2].has(v)) {
-            sharedOffsets.push(v);
+  const [Y, X] = grid.shape; //?
+  let count = 0;
+  for (let yo = 0; yo < Y; yo++) {
+    for (let xo = 0; xo < X; xo++) {
+      if (
+        offsets.filter(([y, x]) => {
+          try {
+            return grid.get(yo + y, xo + x) === "#";
+          } catch (err) {
+            return false;
           }
-        });
-        if (sharedOffsets.length > 0) {
-          sharedOffsets; //?
-        }
+        }).length == offsets.length
+      ) {
+        count += 15;
+        offsets.forEach(([y, x]) => grid.set(yo + y, xo + x, "X"));
       }
     }
   }
-
-  match
-    .join("")
-    .split("")
-    .filter((x) => x === "#").length - 60; //?
-
-  // const regex = /(.{18})#(.{77})#(.{4})##(.{4})##(.{4})###(.{77})#(.{2})#(.{2})#(.{2})#(.{2})#(.{2})#(.{3})/gm;
-
-  // const subst = `$1$2$3$4$5$6$7$8$9$10$11$12`;
-
-  // matches.split("").filter((x) => x === "#").length; //?
-  // // The substituted value will be contained in the result variable
-  // const result = matches.replace(regex, subst);
-
-  // result.split("").filter((x) => x === "#").length; //?
-
-  // const maybehasmonsters = completeMaps
-  //   .filter((map) => {
-  //     return (
-  //       map.slice(0, -2).findIndex((line, index) => {
-  //         const matches = seamonsterregex.map((reg, i) => map[index + i].match(reg));
-  //         const nonnull = matches.filter((x) => x !== null);
-  //         if (nonnull.length == seamonsterregex.length) {
-  //           const indices = nonnull.map((x) => x.index);
-  //           console.log(indices); //?
-  //           return true;
-  //         }
-  //       }) !== -1
-  //     );
-  //   })
-  //   .map((x) => x.join("\n"));
-
-  // maybehasmonsters.forEach((x) => console.log(x));
-
-  // majorlines.filter(x=>seamonsterregex.)
+  return count && grid.data.flat().filter((x) => x === "#").length; //?
 }
 
 function part2(input: string) {}

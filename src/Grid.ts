@@ -44,6 +44,30 @@ export class Grid<T extends string | number> {
         return this.data[i][j];
     }
   }
+
+  set(i: number, j: number, value: T) {
+    switch (this.boundaryCondition) {
+      case "clamp": {
+        const ci = clamp(0, this.upperBounds[0])(i);
+        const cj = clamp(0, this.upperBounds[1])(j);
+        this.data[ci][cj] = value;
+      }
+      case "wrap": {
+        const ci = mod(i, this.shape[0]);
+        const cj = mod(j, this.shape[1]);
+        this.data[ci][cj] = value;
+      }
+      case "reflect": {
+        const ci = rmod(i, this.upperBounds[0]);
+        const cj = rmod(j, this.upperBounds[1]);
+        this.data[ci][cj] = value;
+      }
+
+      case "none":
+      default:
+        this.data[i][j] = value;
+    }
+  }
 }
 
 export namespace Grid {
@@ -88,26 +112,4 @@ export function GridTest() {
     test(() => grid.getXY(4, 7) === "1,0");
     test(() => grid.getXY(-5, -7) === "1,1");
   })();
-
-  (() => {
-    const grid = new Grid([[".", "•", "°", "˚"]]);
-
-    grid.boundaryCondition = "wrap";
-
-    let acc = "";
-    for (let i = 0; i < 20; i++) {
-      acc += grid.getXY(i, 0);
-    }
-    acc; //?
-
-    grid.boundaryCondition = "reflect";
-
-    let accs = "";
-    for (let i = 0; i < 20; i++) {
-      accs += grid.getXY(i, 0);
-    }
-    accs; //?
-  })();
 }
-
-GridTest();
